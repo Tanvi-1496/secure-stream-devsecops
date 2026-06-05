@@ -26,17 +26,17 @@ def home():
 
 @app.route('/search', methods=['GET'])
 def search():
-    # FIX: Parameterized Queries use karke SQL Injection (B608) ko khatam kiya
+    # FIX: Resolved SQL Injection (B608) by implementing parameterized queries
     query = request.args.get('q', '')
 
     conn = sqlite3.connect('test.db')
     cursor = conn.cursor()
     
-    # Raw string injection hata kar '?' placeholder use kiya hai
+    # Removed raw string injection and replaced with a '?' placeholder
     safe_query = "SELECT * FROM users WHERE username = ?"
     
     try:
-        # Tuple ke roop mein safe query aur argument pass kiya
+        # Executed safe query by passing arguments as a tuple
         cursor.execute(safe_query, (query,))
         results = cursor.fetchall()
     except Exception as e:
@@ -48,8 +48,8 @@ def search():
 
 @app.route('/login', methods=['POST'])
 def login():
-    # FIX: Hardcoded credentials (B105) ko hata kar Environment Variables use kiya hai
-    # Agar environment variable nahi mila, toh fallback secure alternate pass hoga, text-string nahi.
+    # FIX: Resolved hardcoded credentials (B105) by using Environment Variables
+    # If environment variable is missing, fallback safely without exposing sensitive data.
     ADMIN_USER = os.environ.get("APP_ADMIN_USER", "admin")
     ADMIN_PASS = os.environ.get("APP_ADMIN_PASSWORD") # Default empty to force configuration
     
@@ -57,16 +57,16 @@ def login():
     username = data.get('username')
     password = data.get('password')
     
-    # Safety Check: Agar environment set nahi hai toh route login fail karega, crash nahi
+    # Safety Check: Return auth error instead of crashing if environment variables are not set
     if not ADMIN_PASS:
         return jsonify({"status": "failure", "message": "Auth configuration missing"}), 500
     
     if username == ADMIN_USER and password == ADMIN_PASS:
-        # FIX: Unsafe eval() execution (B307) ko poori tarah remove kar diya
-        # Hamne input logic ko securely safe integer parsing se control kiya hai
+        # FIX: Completely removed unsafe eval() execution (B307)
+        # Input validation handles integer parsing securely
         extra_command = data.get('extra_command', '2')
         try:
-            # Sirf safe digit mathematical inputs parse karne ke liye safe cast lagaya
+            # Validate input contains only digits before parsing
             if extra_command.isdigit():
                 eval_result = int(extra_command) * 2
             else:
