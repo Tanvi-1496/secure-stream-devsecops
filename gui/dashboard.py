@@ -7,8 +7,7 @@ import matplotlib.pyplot as plt
 
 # Set page config for professional branding
 st.set_page_config(
-    page_title="ReverseFlash: SecureStream GUI",
-    page_icon="⚡",
+    page_title="ReverseFlash: SecureStream",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -20,89 +19,88 @@ if not os.path.exists(os.path.join(current_dir, 'gui')):
     if os.path.exists(os.path.join(parent_dir, 'src')):
         os.chdir(parent_dir)
 
-# Custom Styling injection
+# Custom Styling injection - Premium Dark Mode
 st.markdown("""
 <style>
-    /* Styling to make it dark mode with neon accents */
+    /* Sleek slate-dark theme */
     .stApp {
         background-color: #0b0c10;
         color: #c5c6c7;
     }
     .main-header {
-        background: linear-gradient(135deg, #1f2833 0%, #0b0c10 100%);
-        border: 2px solid #ff003c;
-        border-radius: 12px;
-        padding: 25px;
-        text-align: center;
+        background-color: #0b0c10;
+        border-bottom: 1px solid #333333;
+        padding: 20px 0;
+        text-align: left;
         margin-bottom: 30px;
-        box-shadow: 0 0 15px rgba(255, 0, 60, 0.4);
     }
     .main-title {
-        color: #ff3b3f !important;
+        color: #ffffff !important;
         font-family: 'Outfit', sans-serif;
-        font-size: 3rem !important;
-        font-weight: 800 !important;
-        letter-spacing: 2px;
+        font-size: 2.2rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px;
         text-transform: uppercase;
         margin-bottom: 0px !important;
-        text-shadow: 0 0 10px rgba(255, 59, 63, 0.8);
     }
     .main-subtitle {
-        color: #ffcc00 !important;
+        color: #ff3b3f !important;
         font-family: 'Inter', sans-serif;
-        font-size: 1.2rem;
-        margin-top: 10px;
-        font-weight: 500;
-        letter-spacing: 1px;
+        font-size: 0.9rem;
+        margin-top: 5px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
     }
     .compliance-pass {
-        border: 2px solid #00ffcc;
-        background-color: rgba(0, 255, 204, 0.05);
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+        border: 1px solid #00ffcc;
+        background-color: rgba(0, 255, 204, 0.02);
+        border-radius: 6px;
+        padding: 18px 24px;
+        text-align: left;
         margin-bottom: 25px;
     }
     .compliance-fail {
-        border: 2px solid #ff3b3f;
-        background-color: rgba(255, 59, 63, 0.05);
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 0 15px rgba(255, 59, 63, 0.3);
+        border: 1px solid #ff3b3f;
+        background-color: rgba(255, 59, 63, 0.02);
+        border-radius: 6px;
+        padding: 18px 24px;
+        text-align: left;
         margin-bottom: 25px;
     }
     .section-card {
-        background-color: #1f2833;
-        border: 1px solid #45a29e;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
+        background-color: #12131a;
+        border: 1px solid #2b2e3a;
+        border-radius: 6px;
+        padding: 18px;
+        margin-bottom: 15px;
     }
     .severity-high {
         background-color: #ff3b3f;
         color: white;
         padding: 3px 8px;
-        border-radius: 4px;
+        border-radius: 3px;
         font-weight: bold;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        text-transform: uppercase;
     }
     .severity-medium {
         background-color: #ffa500;
         color: white;
         padding: 3px 8px;
-        border-radius: 4px;
+        border-radius: 3px;
         font-weight: bold;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        text-transform: uppercase;
     }
     .severity-low {
         background-color: #ffcc00;
         color: black;
         padding: 3px 8px;
-        border-radius: 4px;
+        border-radius: 3px;
         font-weight: bold;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        text-transform: uppercase;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -110,24 +108,24 @@ st.markdown("""
 # Application Header
 st.markdown("""
 <div class="main-header">
-    <h1 class="main-title">⚡ ReverseFlash: SecureStream ⚡</h1>
-    <div class="main-subtitle">Shift-Left Local Pre-Push Compliance Dashboard</div>
+    <h1 class="main-title">ReverseFlash: SecureStream</h1>
+    <div class="main-subtitle">Pre-Commit Compliance Center</div>
 </div>
 """, unsafe_allow_html=True)
 
 # Sidebar configurations
-st.sidebar.markdown("<h2 style='color:#ff3b3f; text-shadow: 0 0 5px rgba(255,59,63,0.5);'>⚙️ CONTROL PANEL</h2>", unsafe_allow_html=True)
-demo_mode = st.sidebar.checkbox("🧪 Demo Mode (Mock Vulnerabilities)", value=False, help="Enable this to simulate failing security checks and view visual chart displays.")
+st.sidebar.markdown("<h2 style='color:#ff3b3f; font-size: 1.4rem; letter-spacing: 0.5px;'>Control Panel</h2>", unsafe_allow_html=True)
+demo_mode = st.sidebar.checkbox("Demo Mode (Simulated Vulnerabilities)", value=False, help="Simulate failing checks to test dashboard interface behavior.")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
-### 🛡️ Pre-Commit Compliance Rules
-1. **SAST (Bandit)**: Zero **HIGH** severity findings allowed in `src/`.
-2. **Dependency Audit**: Zero **HIGH** or **MEDIUM** severity structural defects in `requirements.txt`.
-3. All dependencies must be strictly version-pinned (`==`).
+### Compliance Requirements
+1. **SAST (Bandit)**: Zero High-severity findings allowed in codebase.
+2. **Dependency Audit**: Zero High or Medium vulnerabilities in package configurations.
+3. **Version Pinning**: All dependencies must use strict version pinning (==).
 """)
 st.sidebar.markdown("---")
-st.sidebar.info("Designed to check compliance locally, saving GitHub Action runner minutes and ensuring green PR ticks.")
+st.sidebar.info("Designed to check compliance locally, preserving cloud runner minutes and assuring pipeline deployment success.")
 
 # Local scan logic functions
 def run_bandit_scan():
@@ -308,10 +306,10 @@ def get_mock_findings():
     return mock_bandit, mock_deps
 
 # Main execution panel
-st.markdown("### 🔍 Pre-Commit Control Center")
+st.markdown("### Pre-Commit Control Center")
 st.write("Ensure local modifications comply with standard pipeline security rules prior to code commit/push.")
 
-execute_scans = st.button("⚡ Execute Pre-Commit Scan Suite", use_container_width=True)
+execute_scans = st.button("Run Pre-Commit Scan Suite", use_container_width=True)
 
 if execute_scans:
     with st.spinner("Executing Local DevSecOps Scan Suite..."):
@@ -342,18 +340,18 @@ if execute_scans:
         if total_high > 0 or total_medium > 0:
             st.markdown(f"""
             <div class="compliance-fail">
-                <h2 style="color: #ff3b3f !important; margin:0;">❌ Compliance Status: FAILED</h2>
-                <p style="margin: 5px 0 0 0; font-size:1.1rem;">
-                    Found <b>{total_high} HIGH</b> and <b>{total_medium} MEDIUM</b> severity issues. Do NOT push to production!
+                <h3 style="color: #ff3b3f !important; margin:0; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Compliance Failed</h3>
+                <p style="margin: 8px 0 0 0; font-size:1rem; color:#c5c6c7;">
+                    Found {total_high} High and {total_medium} Medium severity defects. Do not push to remote repository.
                 </p>
             </div>
             """, unsafe_allow_html=True)
         else:
             st.markdown("""
             <div class="compliance-pass">
-                <h2 style="color: #00ffcc !important; margin:0;">✅ Compliance Status: PASSED</h2>
-                <p style="margin: 5px 0 0 0; font-size:1.1rem;">
-                    Local checks are fully clean. Safe to perform Git push!
+                <h3 style="color: #00ffcc !important; margin:0; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Compliance Passed</h3>
+                <p style="margin: 8px 0 0 0; font-size:1rem; color:#c5c6c7;">
+                    All local scans completed successfully. Safe to perform Git push operations.
                 </p>
             </div>
             """, unsafe_allow_html=True)
@@ -362,35 +360,35 @@ if execute_scans:
         col_metrics, col_chart = st.columns([1, 1])
 
         with col_metrics:
-            st.markdown("### 📊 Metrics Summary")
+            st.markdown("### Scan Metrics")
             
-            # Custom styled metric container
+            # Custom styled metric container - Clean & Flat
             st.markdown(f"""
             <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <div style="flex: 1; background-color: #1f2833; border: 2px solid #ff3b3f; border-radius: 8px; padding: 15px; text-align: center;">
-                    <div style="font-size: 0.9rem; font-weight: bold; color: #ff3b3f; text-transform: uppercase;">High Severity</div>
-                    <div style="font-size: 2.2rem; font-weight: 800; color: #ffffff;">{total_high}</div>
+                <div style="flex: 1; background-color: #12131a; border: 1px solid #ff3b3f; border-radius: 6px; padding: 15px;">
+                    <div style="font-size: 0.8rem; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.5px;">High</div>
+                    <div style="font-size: 2.2rem; font-weight: 700; color: #ff3b3f; margin-top: 5px;">{total_high}</div>
                 </div>
-                <div style="flex: 1; background-color: #1f2833; border: 2px solid #ffa500; border-radius: 8px; padding: 15px; text-align: center;">
-                    <div style="font-size: 0.9rem; font-weight: bold; color: #ffa500; text-transform: uppercase;">Medium Severity</div>
-                    <div style="font-size: 2.2rem; font-weight: 800; color: #ffffff;">{total_medium}</div>
+                <div style="flex: 1; background-color: #12131a; border: 1px solid #ffa500; border-radius: 6px; padding: 15px;">
+                    <div style="font-size: 0.8rem; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.5px;">Medium</div>
+                    <div style="font-size: 2.2rem; font-weight: 700; color: #ffa500; margin-top: 5px;">{total_medium}</div>
                 </div>
-                <div style="flex: 1; background-color: #1f2833; border: 2px solid #ffcc00; border-radius: 8px; padding: 15px; text-align: center;">
-                    <div style="font-size: 0.9rem; font-weight: bold; color: #ffcc00; text-transform: uppercase;">Low Severity</div>
-                    <div style="font-size: 2.2rem; font-weight: 800; color: #ffffff;">{total_low}</div>
+                <div style="flex: 1; background-color: #12131a; border: 1px solid #ffcc00; border-radius: 6px; padding: 15px;">
+                    <div style="font-size: 0.8rem; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.5px;">Low</div>
+                    <div style="font-size: 2.2rem; font-weight: 700; color: #ffcc00; margin-top: 5px;">{total_low}</div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
             
-            st.markdown("#### Scan Performance Details")
-            st.write(f"- **Bandit SAST Scanned Files**: {len(set(f['filename'] for f in bandit_findings)) if bandit_findings else 0}")
-            st.write(f"- **Total Bandit Issues Found**: {len(bandit_findings)}")
-            st.write(f"- **Total Dependency Flaws Found**: {len(dep_findings)}")
+            st.markdown("#### Performance Metrics")
+            st.write(f"- Scanned files: {len(set(f['filename'] for f in bandit_findings)) if bandit_findings else 0}")
+            st.write(f"- Bandit SAST findings: {len(bandit_findings)}")
+            st.write(f"- Dependency vulnerabilities: {len(dep_findings)}")
             if bandit_err:
                 st.warning(bandit_err)
 
         with col_chart:
-            st.markdown("### 🍩 Severity Distribution")
+            st.markdown("### Severity Distribution")
             
             # Setup Matplotlib pie/donut chart
             plt.rcParams['text.color'] = '#c5c6c7'
@@ -424,7 +422,7 @@ if execute_scans:
                     autotext.set_fontweight('bold')
                     autotext.set_fontsize(10)
             else:
-                ax.text(0.5, 0.5, 'Zero Vulnerabilities Detected 🎉\nAll systems nominal.', 
+                ax.text(0.5, 0.5, 'Zero Defects\nVerified', 
                         horizontalalignment='center', verticalalignment='center',
                         transform=ax.transAxes, fontsize=12, color='#00ffcc', fontweight='bold')
                 ax.axis('off')
@@ -433,12 +431,12 @@ if execute_scans:
 
         # Tab layout for Detailed Scan reports
         st.markdown("---")
-        st.markdown("### 📋 Detailed Vulnerability Breakdown")
-        tab_bandit, tab_deps = st.tabs(["🔒 Bandit SAST Results", "📦 Dependency Audit Results"])
+        st.markdown("### Detailed Vulnerability Breakdown")
+        tab_bandit, tab_deps = st.tabs(["Bandit SAST Results", "Dependency Audit Results"])
 
         with tab_bandit:
             if not bandit_findings:
-                st.success("No SAST vulnerabilities found in source code directory!")
+                st.success("No static analysis issues identified in the codebase.")
             else:
                 for idx, issue in enumerate(bandit_findings, 1):
                     sev = issue["issue_severity"]
@@ -447,19 +445,19 @@ if execute_scans:
                     st.markdown(f"""
                     <div class="section-card">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <span style="font-weight:bold; font-size:1.1rem; color:#ff3b3f;">Finding #{idx}: {issue['issue_text']}</span>
+                            <span style="font-weight:600; font-size:1rem; color:#ffffff;">Finding {idx}: {issue['issue_text']}</span>
                             <span class="{sev_class}">{sev}</span>
                         </div>
-                        <div style="font-size:0.9rem; line-height:1.5;">
+                        <div style="font-size:0.9rem; color:#888888; line-height:1.5;">
                             <b>Location:</b> <code>{issue['filename']}</code> (Line {issue['line_number']})<br>
-                            <b>Bandit Test ID:</b> {issue.get('test_id', 'N/A')}
+                            <b>Rule ID:</b> {issue.get('test_id', 'N/A')}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
 
         with tab_deps:
             if not dep_findings:
-                st.success("No dependency definition structural defects found!")
+                st.success("No dependency vulnerability issues identified in requirements.txt.")
             else:
                 for idx, dep in enumerate(dep_findings, 1):
                     sev = dep["severity"]
@@ -468,13 +466,13 @@ if execute_scans:
                     st.markdown(f"""
                     <div class="section-card">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <span style="font-weight:bold; font-size:1.1rem; color:#ffcc00;">Dependency Defect #{idx}: {dep['package']}</span>
+                            <span style="font-weight:600; font-size:1rem; color:#ffffff;">Dependency Defect {idx}: {dep['package']}</span>
                             <span class="{sev_class}">{sev}</span>
                         </div>
-                        <div style="font-size:0.9rem; line-height:1.5;">
-                            <b>Message:</b> {dep['message']}
+                        <div style="font-size:0.9rem; color:#888888; line-height:1.5;">
+                            <b>Advisory:</b> {dep['message']}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
 else:
-    st.info("Click the execute button above to trigger local verification scans.")
+    st.info("Execute scans to run local audits.")
