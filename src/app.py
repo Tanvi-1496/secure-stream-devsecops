@@ -1,3 +1,4 @@
+from flask import Response
 import collections
 import collections.abc
 # Monkey-patch collections to support old Flask/Werkzeug versions on Python 3.10+
@@ -20,6 +21,12 @@ def init_db():
 
 init_db()
 
+@app.route('/metrics')
+def metrics():
+    return Response(
+        "flask_app_up 1\n",
+        mimetype="text/plain"
+    )
 @app.route('/')
 def home():
     return "Hello from ReverseFlash Secure App (Secure Version)"
