@@ -1,90 +1,146 @@
-from flask import Response
+from flask import Flask, request, jsonify, Response
 import collections
 import collections.abc
-# Monkey-patch collections to support old Flask/Werkzeug versions on Python 3.10+
-collections.MutableMapping = collections.abc.MutableMapping
-
-from flask import Flask, request, jsonify
 import sqlite3
 import os
 
+from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
+
+# Monkey-patch for compatibility (safe for your setup)
+collections.MutableMapping = collections.abc.MutableMapping
+
 app = Flask(__name__)
 
-# Initialize a dummy database for testing
+# -----------------------------
+# PROMETHEUS METRICS
+# -----------------------------
+REQUEST_COUNT = Counter(
+    'flask_requests_total',
+    'Total number of requests to Flask app'
+)
+
+SEARCH_COUNT = Counter(
+    'flask_search_requests_total',
+    'Total number of search requests'
+)
+
+LOGIN_SUCCESS = Counter(
+    'flask_login_success_total',
+    'Total successful logins'
+)
+
+LOGIN_FAILURE = Counter(
+    'flask_login_failure_total',
+    'Total failed logins'
+)
+
+# -----------------------------
+# INIT DB
+# -----------------------------
 def init_db():
     conn = sqlite3.connect('test.db')
     cursor = conn.cursor()
-    cursor.execute('''CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT)''')
-    cursor.execute('''INSERT OR IGNORE INTO users (id, username) VALUES (1, 'admin')''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY,
+            username TEXT
+        )
+    ''')
+    cursor.execute('INSERT OR IGNORE INTO users (id, username) VALUES (1, "admin")')
     conn.commit()
     conn.close()
 
 init_db()
 
+# -----------------------------
+# METRICS ENDPOINT (PROMETHEUS)
+# -----------------------------
 @app.route('/metrics')
 def metrics():
-    return Response(
-        "flask_app_up 1\n",
-        mimetype="text/plain"
-    )
+    return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
+
+# -----------------------------
+# HOME ROUTE
+# -----------------------------
 @app.route('/')
 def home():
+    REQUEST_COUNT.inc()
     return "Hello from ReverseFlash Secure App (Secure Version)"
 
+# -----------------------------
+# SEARCH ROUTE
+# -----------------------------
 @app.route('/search', methods=['GET'])
 def search():
-    # FIX: Parameterized Queries use karke SQL Injection (B608) ko khatam kiya
+    REQUEST_COUNT.inc()
+    SEARCH_COUNT.inc()
+
     query = request.args.get('q', '')
 
     conn = sqlite3.connect('test.db')
     cursor = conn.cursor()
-    
-    # Raw string injection hata kar '?' placeholder use kiya hai
+
     safe_query = "SELECT * FROM users WHERE username = ?"
-    
+
     try:
-        # Tuple ke roop mein safe query aur argument pass kiya
         cursor.execute(safe_query, (query,))
         results = cursor.fetchall()
     except Exception as e:
         results = str(e)
     finally:
         conn.close()
-        
-    return jsonify({"query_executed": safe_query, "results": results})
 
+    return jsonify({
+        "query_executed": safe_query,
+        "results": results
+    })
+
+# -----------------------------
+# LOGIN ROUTE
+# -----------------------------
 @app.route('/login', methods=['POST'])
 def login():
-    # FIX: Hardcoded credentials (B105) ko hata kar Environment Variables use kiya hai
-    # Agar environment variable nahi mila, toh fallback secure alternate pass hoga, text-string nahi.
+    REQUEST_COUNT.inc()
+
     ADMIN_USER = os.environ.get("APP_ADMIN_USER", "admin")
-    ADMIN_PASS = os.environ.get("APP_ADMIN_PASSWORD") # Default empty to force configuration
-    
+    ADMIN_PASS = os.environ.get("APP_ADMIN_PASSWORD")
+
     data = request.json or {}
     username = data.get('username')
     password = data.get('password')
-    
-    # Safety Check: Agar environment set nahi hai toh route login fail karega, crash nahi
+
     if not ADMIN_PASS:
-        return jsonify({"status": "failure", "message": "Auth configuration missing"}), 500
-    
+        LOGIN_FAILURE.inc()
+        return jsonify({
+            "status": "failure",
+            "message": "Auth configuration missing"
+        }), 500
+
     if username == ADMIN_USER and password == ADMIN_PASS:
-        # FIX: Unsafe eval() execution (B307) ko poori tarah remove kar diya
-        # Hamne input logic ko securely safe integer parsing se control kiya hai
+
+        LOGIN_SUCCESS.inc()
+
         extra_command = data.get('extra_command', '2')
         try:
-            # Sirf safe digit mathematical inputs parse karne ke liye safe cast lagaya
             if extra_command.isdigit():
                 eval_result = int(extra_command) * 2
             else:
                 eval_result = "Invalid numeric instruction"
         except Exception as e:
             eval_result = str(e)
-            
-        return jsonify({"status": "success", "admin_portal": True, "result_processed": eval_result})
-    
+
+        return jsonify({
+            "status": "success",
+            "admin_portal": True,
+            "result_processed": eval_result
+        })
+
+    LOGIN_FAILURE.inc()
+
     return jsonify({"status": "failure"}), 401
 
-
+# -----------------------------
+# RUN APP
+# -----------------------------
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000) #nosec B104
+    app.run(host='0.0.0.0', port=5000)  # nose B104
